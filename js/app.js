@@ -11034,7 +11034,7 @@
                     showMoreButton = Array.from(showMoreButton).filter((item => item.closest("[data-showmore]") === showMoreBlock))[0];
                     const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
                     if (matchMedia.matches || !matchMedia) if (hiddenHeight < getOriginalHeight(showMoreContent)) {
-                        _slideUp(showMoreContent, 0, hiddenHeight);
+                        _slideUp(showMoreContent, 0, showMoreBlock.classList.contains("_showmore-active") ? getOriginalHeight(showMoreContent) : hiddenHeight);
                         showMoreButton.hidden = false;
                     } else {
                         _slideDown(showMoreContent, 0, hiddenHeight);
@@ -11047,14 +11047,19 @@
                 function getHeight(showMoreBlock, showMoreContent) {
                     let hiddenHeight = 0;
                     const showMoreType = showMoreBlock.dataset.showmore ? showMoreBlock.dataset.showmore : "size";
+                    const rowGap = parseFloat(getComputedStyle(showMoreContent).rowGap) ? parseFloat(getComputedStyle(showMoreContent).rowGap) : 0;
                     if ("items" === showMoreType) {
                         const showMoreTypeValue = showMoreContent.dataset.showmoreContent ? showMoreContent.dataset.showmoreContent : 3;
                         const showMoreItems = showMoreContent.children;
                         for (let index = 1; index < showMoreItems.length; index++) {
                             const showMoreItem = showMoreItems[index - 1];
-                            hiddenHeight += showMoreItem.offsetHeight;
+                            const marginTop = parseFloat(getComputedStyle(showMoreItem).marginTop) ? parseFloat(getComputedStyle(showMoreItem).marginTop) : 0;
+                            const marginBottom = parseFloat(getComputedStyle(showMoreItem).marginBottom) ? parseFloat(getComputedStyle(showMoreItem).marginBottom) : 0;
+                            hiddenHeight += showMoreItem.offsetHeight + marginTop;
                             if (index == showMoreTypeValue) break;
+                            hiddenHeight += marginBottom;
                         }
+                        rowGap ? hiddenHeight += (showMoreTypeValue - 1) * rowGap : null;
                     } else {
                         const showMoreTypeValue = showMoreContent.dataset.showmoreContent ? showMoreContent.dataset.showmoreContent : 150;
                         hiddenHeight = showMoreTypeValue;
